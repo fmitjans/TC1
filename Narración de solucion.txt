@@ -1,0 +1,79 @@
+1. Como dicen las intrucciones, voy al directorio /mystery y uso
+el comando ( less crimescene ) para leer el archivo.
+
+2. Después de buscar CLUE un rato, quiero ver cuantas líneas hay
+usando el comando ( wc crimescene ); son 13565 líneas
+
+3. Puedo ver las lineas que empiezan con CLUE con el comando 
+(grep CLUE crimescene), que muestra tres pistas
+*El script detective.sh imprimirá las pistas
+
+4. Usando ( wc ), puedo ver que los archivos "people" "vehicles"
+y al interior de /interviews, /memberships y /streets son 
+imposibles de leer manualmente por tener demasiadas líneas.
+
+5. El archivo "people" es el más fácil de filtrar, gracias a la 
+pista 3 tengo el nombre de una testigo: "Annabel"
+
+6. El comando ( grep "Annabel" people) imprime 4 personas, solo 
+dos son mujer: Annabel Church y Annabel Sun
+
+7. Desde el directorio /interviews puedo buscar si se menciona 
+alguno de los apellidos:
+
+( grep Sun * ) : interview-47246024:Ms. Sun has brown hair and is 
+not from New Zealand.  Not the witness from the cafe.
+
+( grep Church ¨* ): interview-699607:Interviewed Ms. Church
+ at 2:04 pm. Witness stated that she did not see anyone she
+ could identify as the shooter, that she ran away as soon as
+ the shots were fired.
+However, she reports seeing the car that fled the scene.  
+Describes it as a blue Honda, with a license plate that 
+starts with "L337" and ends with "9""
+
+8. Ahora sabemos que el auto del culpable es un Honda azul, y su
+patente empieza con L337 y termina con 9. Podemos filtrar el 
+archivo vehicles para obtener estas tres condiciones
+
+9. Usaremos tres comandos en pipe:
+(grep -A5 L337.*9 vehicles) busca en vehicles lineas que contengan
+L337*9 pudiendo ser * cualquier conjunto de caracteres, y la 
+imprime junto con las cinco lineas siguientes.
+( grep -B2 -A5 "Make: Honda" ) busca en el output anterior los
+autos de marca Honda, y entrega 2 filas anteriores y 5 posteriores
+(grep -B2 -A4 "Color: Blue" ) hace lo mismo con los autos azules.
+* El script guardará el resultado en el archivo "cars"
+
+10. Del paso anterior obtenemos seis vehículos. Podemos buscar las
+entrevistas de los dueños desde el directorio /interviews con el
+comando ( grep "Apellido" * ). Estas entrevistas nos permiten 
+eliminar a cuatro de los sospechosos.
+* Después de ejecutar el script detective.sh:
+Las entrevistas están en el archivo entrevistas
+Los sospechosos restantes estan en el archivo car_suspects
+
+11. Por último, la pista 2 nos dice el nombre de 4 grupos a los
+que pertenece el culpable, para conseguir los miembros que tengan
+los 4 grupos en común, guardamos los miembros de dos clubs en una
+lista, y usamos ( uniq -d ) para dejar solamente los repetidos.
+Luego hacemos lo mismo con las listas que van quedando.
+* El script guarda la lista final (23 personas) en member_suspects
+
+12. Finalmente, teniendo un archivo con los dueños de los autos,
+y otra con los miembros de los clubs, usamos ( uniq -d) para 
+despejar a la única persona que tiene el auto indicado y es 
+miembro de los 4 grupos: Jeremy Bowers.
+* El script hace esta operacion y la guarda en finalsuspect
+ 
+
+
+
+
+
+
+
+
+
+
+
